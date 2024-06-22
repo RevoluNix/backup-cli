@@ -34,14 +34,16 @@ jobs:
       - name: Generate package.nix
         id: generate_package
         run: |
-          ESCAPED_FILE_URL=$(echo "https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/${{ env.FILE_NAME }}" | sed 's/\//\\\//g')
-          echo "ESCAPED_FILE_URL=$ESCAPED_FILE_URL" >> $GITHUB_ENV
+          URL=$(echo \
+            "https://github.com/${{ github.repository }}/releases/download/${{ env.TAG_NAME }}/${{ env.FILE_NAME }}" \
+              | sed 's/\//\\\//g'
+          )
           SRC="src = fetchurl {\n    url = \"./${{ env.FILE_NAME }}\";\n    sha256 = \"${{ env.FILE_HASH }}\";\n  }"
           sed -i "s/src = .\/src/${SRC}/g" ./package.nix
           sed -i "s/version = \".*\";/version = \"${{ env.TAG_NAME }}\";/g" ./package.nix
           sed -i "1s/.*/{\n  fetchurl,/" ./package.nix
           nix build
-          sed -i "s/url = \"./${{ env.FILE_NAME }}\";/url = \"./${{ env.ESCAPED_FILE_URL }}\";/g" ./package.nix
+          sed -i "s/url = \".\/${{ env.FILE_NAME }}\";/url = \".\/${URL}\";/g" ./package.nix
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
