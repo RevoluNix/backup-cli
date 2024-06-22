@@ -43,7 +43,7 @@ jobs:
           sed -i "s/version = \".*\";/version = \"${{ env.TAG_NAME }}\";/g" ./package.nix
           sed -i "1s/.*/{\n  fetchurl,/" ./package.nix
           nix build
-          sed -i "s/url = \"./${{ env.FILE_NAME }}\";/url = \"./${{ env.ESCAPED_FILE_URL }}\";/g" ./package.nix
+          sed -i "s/url = \"./${{ env.FILE_NAME }}\";/url = \".\/${{ env.ESCAPED_FILE_URL }}\";/g" ./package.nix
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
